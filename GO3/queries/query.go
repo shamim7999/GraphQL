@@ -11,15 +11,15 @@ var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
 		///////////////////////////
-		"GetBooksByAuthID": &graphql.Field{
+		"GetBooksByAuthorName": &graphql.Field{
 			Type:        graphql.NewList(schema.BookType),
 			Description: "List of books with associated todos",
 			Args: graphql.FieldConfigArgument{
-				"author_id": &graphql.ArgumentConfig{
+				"author_name": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
 			},
-			Resolve: resolver.GetBooksByAuthID,
+			Resolve: resolver.GetBooksByAuthorName,
 		},
 
 		"GetBooks": &graphql.Field{

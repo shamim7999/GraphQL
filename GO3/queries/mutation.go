@@ -12,7 +12,7 @@ var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 	Fields: graphql.Fields{
 		"CreateNewAuthor": &graphql.Field{
 			Type:        schema.AuthorType,
-			Description: "Create new todo",
+			Description: "Create new Author",
 			Args:        graphql.FieldConfigArgument{},
 			Resolve:     resolver.CreateNewAuthor,
 		},

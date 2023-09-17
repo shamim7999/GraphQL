@@ -14,18 +14,15 @@ import (
 )
 
 func init() {
-	Authors1 := schema.Author{ID: "a", Text: "A Authors not to forget", Authors: "Shamim"}
-	Authors2 := schema.Author{ID: "b", Text: "This is the most important", Authors: "Saiful"}
-	Authors3 := schema.Author{ID: "b", Text: "Please do this or else", Authors: "Saiful"}
-	Authors4 := schema.Author{ID: "c", Text: "Please do this or else", Authors: "Ashraful"}
-	Authors5 := schema.Author{ID: "a", Text: "Please do this or else", Authors: "Shamim"}
-	Authors6 := schema.Author{ID: "a", Text: "Please do this or else", Authors: "Shamim"}
-	schema.AuthorList = append(schema.AuthorList, Authors1, Authors2, Authors3, Authors4, Authors5, Authors6)
+	Authors1 := schema.Author{ID: "a", AuthorName: "Shamim"}
+	Authors2 := schema.Author{ID: "b", AuthorName: "Saiful"}
+	Authors3 := schema.Author{ID: "c", AuthorName: "Ashraful"}
+	schema.AuthorList = append(schema.AuthorList, Authors1, Authors2, Authors3)
 
-	book1 := schema.Book{ID: "a1", Title: "A Authors not to forget", Author_Id: "a", Author: schema.AuthorList}
-	book2 := schema.Book{ID: "b2", Title: "This is the most important", Author_Id: "a", Author: schema.AuthorList}
-	book3 := schema.Book{ID: "c3", Title: "Please do this or else", Author_Id: "b", Author: schema.AuthorList}
-	book4 := schema.Book{ID: "d4", Title: "Please do this or else", Author_Id: "c", Author: schema.AuthorList}
+	book1 := schema.Book{ID: "a1", Title: "Golang", Authors: []string{"Shamim", "Saiful", "Ashraful", "Neaj"}, Author: schema.AuthorList}
+	book2 := schema.Book{ID: "b2", Title: "C/C++", Authors: []string{"Ashraful", "Neaj"}, Author: schema.AuthorList}
+	book3 := schema.Book{ID: "c3", Title: "JAVA", Authors: []string{"Ashraful", "Neaj"}, Author: schema.AuthorList}
+	book4 := schema.Book{ID: "d4", Title: "Python", Authors: []string{"Shamim", "Saiful"}, Author: schema.AuthorList}
 	schema.BookList = append(schema.BookList, book1, book2, book3, book4)
 	rand.Seed(time.Now().UnixNano())
 }
@@ -56,7 +53,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		result := executeQuery(t.Query, queries.Todo)
+		result := executeQuery(t.Query, queries.QueriesAndMutation)
 		json.NewEncoder(w).Encode(result)
 	})
 	// Serve static files

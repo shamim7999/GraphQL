@@ -8,9 +8,8 @@ var (
 )
 
 type Author struct {
-	ID      string `json:"id"`
-	Text    string `json:"text"`
-	Authors string `json:"authors"`
+	ID      		string `json:"id"`
+	AuthorName 		string `json:"author_name"`
 }
 
 var AuthorType = graphql.NewObject(graphql.ObjectConfig{
@@ -19,10 +18,7 @@ var AuthorType = graphql.NewObject(graphql.ObjectConfig{
 		"id": &graphql.Field{
 			Type: graphql.String,
 		},
-		"text": &graphql.Field{
-			Type: graphql.String,
-		},
-		"authors": &graphql.Field{
+		"author_name": &graphql.Field{
 			Type: graphql.String,
 		},
 	},

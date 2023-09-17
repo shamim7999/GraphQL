@@ -3,15 +3,15 @@ package schema
 import "github.com/graphql-go/graphql"
 
 var (
-	//AuthorList []Author
+	// AuthorList []Author
 	BookList []Book
 )
 
 type Book struct {
 	ID        string   `json:"id"`
 	Title     string   `json:"title"`
-	Author_Id string   `json:"author_id"`
-	Author    []Author `json:"book_author"`
+	Authors   []string `json:"book_authors"`
+	Author    []Author `json:"book_author_type"`
 }
 
 var BookType = graphql.NewObject(graphql.ObjectConfig{
@@ -23,10 +23,10 @@ var BookType = graphql.NewObject(graphql.ObjectConfig{
 		"title": &graphql.Field{
 			Type: graphql.String,
 		},
-		"author_id": &graphql.Field{
-			Type: graphql.String,
+		"book_authors": &graphql.Field{
+			Type: graphql.NewList(graphql.String),
 		},
-		"book_author": &graphql.Field{
+		"book_author_type": &graphql.Field{
 			Type: graphql.NewList(AuthorType),
 		},
 	},

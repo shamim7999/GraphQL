@@ -17,25 +17,29 @@ func RandStringRunes(n int) string {
 	return string(b)
 }
 
-func GetBooksByAuthID(p graphql.ResolveParams) (interface{}, error) {
-	authorID, isOK := p.Args["author_id"].(string)
+func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
+	authorName, isOK := p.Args["author_name"].(string)
 	if !isOK {
 		return nil, nil
 	}
 
-	var matchingAuthors []schema.Author
-	var boi []schema.Book
+	//var matchingAuthors []schema.Author
+	var BooksByAuthorName []schema.Book
 
-	for _, ids := range schema.AuthorList {
-		if ids.ID == authorID {
-			matchingAuthors = append(matchingAuthors, ids)
+	for _, datas := range schema.BookList {
+		for _, name := range datas.Authors {
+			if name == authorName {
+				BooksByAuthorName = append(BooksByAuthorName, schema.Book{
+					ID:      datas.ID,
+					Title:   datas.Title,
+					Authors: datas.Authors,
+				})
+				break
+			}
 		}
 	}
-	boi = append(boi, schema.Book{
-		Author:    matchingAuthors,
-		Author_Id: authorID,
-	})
-	return boi, nil
+
+	return BooksByAuthorName, nil
 }
 
 func GetBooks(p graphql.ResolveParams) (interface{}, error) {
@@ -45,33 +49,10 @@ func GetBooks(p graphql.ResolveParams) (interface{}, error) {
 func CreateNewAuthor(params graphql.ResolveParams) (interface{}, error) {
 
 	newID := RandStringRunes(8)
-
-	var (
-		texts   string
-		authors string
-	)
-
-	//fmt.Printf("Enter a Author Name: ")
-
-	//_, err := fmt.Scanf("%v\n", &authors)
-	//if err != nil {
-	//	fmt.Printf("Error: ", err)
-	//	return nil, nil
-	//}
-
-	//fmt.Printf("Enter some Texts: ")
-
-	//_, err = fmt.Scanf("%v\n", &texts)
-	//if err != nil {
-	//	fmt.Printf("Error: ", err)
-	//	return nil, nil
-	//}
-	authors = "Shamim Sarker"
-	texts = "Clean Architecture"
+	authors := "Shamim"
 	newAuthor := schema.Author{
 		ID:      newID,
-		Text:    texts,
-		Authors: authors,
+		AuthorName: authors,
 	}
 
 	schema.AuthorList = append(schema.AuthorList, newAuthor)

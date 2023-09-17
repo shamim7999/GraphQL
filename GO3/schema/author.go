@@ -7,10 +7,9 @@ var (
 	//BookList []Book
 )
 
-
 type Author struct {
-	ID     string `json:"id"`
-	Text   string `json:"text"`
+	ID      string `json:"id"`
+	Text    string `json:"text"`
 	Authors string `json:"authors"`
 }
 
@@ -23,7 +22,7 @@ var AuthorType = graphql.NewObject(graphql.ObjectConfig{
 		"text": &graphql.Field{
 			Type: graphql.String,
 		},
-		"author": &graphql.Field{
+		"authors": &graphql.Field{
 			Type: graphql.String,
 		},
 	},

@@ -1,7 +1,6 @@
 package resolver
 
 import (
-	"fmt"
 	"graphql_test/schema"
 	"math/rand"
 
@@ -18,7 +17,7 @@ func RandStringRunes(n int) string {
 	return string(b)
 }
 
-func Getbooks_by_authid(p graphql.ResolveParams) (interface{}, error) {
+func GetBooksByAuthID(p graphql.ResolveParams) (interface{}, error) {
 	authorID, isOK := p.Args["author_id"].(string)
 	if !isOK {
 		return nil, nil
@@ -33,17 +32,17 @@ func Getbooks_by_authid(p graphql.ResolveParams) (interface{}, error) {
 		}
 	}
 	boi = append(boi, schema.Book{
-		Author:      matchingAuthors,
+		Author:    matchingAuthors,
 		Author_Id: authorID,
 	})
 	return boi, nil
 }
 
-func Getbooks(p graphql.ResolveParams) (interface{}, error) {
+func GetBooks(p graphql.ResolveParams) (interface{}, error) {
 	return schema.BookList, nil
 }
 
-func Create_Author(params graphql.ResolveParams) (interface{}, error) {
+func CreateNewAuthor(params graphql.ResolveParams) (interface{}, error) {
 
 	newID := RandStringRunes(8)
 
@@ -52,24 +51,26 @@ func Create_Author(params graphql.ResolveParams) (interface{}, error) {
 		authors string
 	)
 
-	fmt.Printf("Enter a Author Name: ")
+	//fmt.Printf("Enter a Author Name: ")
 
-	_, err := fmt.Scanf("%v\n", &authors)
-	if err != nil {
-		fmt.Printf("Error: ", err)
-		return nil, nil
-	}
+	//_, err := fmt.Scanf("%v\n", &authors)
+	//if err != nil {
+	//	fmt.Printf("Error: ", err)
+	//	return nil, nil
+	//}
 
-	fmt.Printf("Enter some Texts: ")
+	//fmt.Printf("Enter some Texts: ")
 
-	_, err = fmt.Scanf("%v\n", &texts)
-	if err != nil {
-		fmt.Printf("Error: ", err)
-		return nil, nil
-	}
+	//_, err = fmt.Scanf("%v\n", &texts)
+	//if err != nil {
+	//	fmt.Printf("Error: ", err)
+	//	return nil, nil
+	//}
+	authors = "Shamim Sarker"
+	texts = "Clean Architecture"
 	newAuthor := schema.Author{
-		ID:     newID,
-		Text:   texts,
+		ID:      newID,
+		Text:    texts,
 		Authors: authors,
 	}
 

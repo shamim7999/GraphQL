@@ -10,11 +10,11 @@ import (
 var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootMutation",
 	Fields: graphql.Fields{
-		"createTodo": &graphql.Field{
+		"CreateNewAuthor": &graphql.Field{
 			Type:        schema.AuthorType,
 			Description: "Create new todo",
 			Args:        graphql.FieldConfigArgument{},
-			Resolve:     resolver.Create_Author,
+			Resolve:     resolver.CreateNewAuthor,
 		},
 	},
 })

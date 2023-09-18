@@ -99,3 +99,43 @@ func CreateNewAuthorByParameter(p graphql.ResolveParams) (interface{}, error) {
 	schema.AuthorList = append(schema.AuthorList, newAuthor)
 	return newAuthor, nil
 }
+
+func CreateNewBook(p graphql.ResolveParams) (interface{}, error) {
+	newBook := schema.Book{
+		ID:      RandStringRunes(8),
+		Title:   "A new Book",
+		Authors: []string{"Ashraful", "Ashik", "Morshed"},
+		Author:  schema.AuthorList,
+	}
+	schema.BookList = append(schema.BookList, newBook)
+	return newBook, nil
+}
+
+func CreateNewBookByParameter(p graphql.ResolveParams) (interface{}, error) {
+	newID := RandStringRunes(8)
+	newTitle, isOK := p.Args["title"].(string)
+	if !isOK {
+		return nil, nil
+	}
+	bookAuthors, isOK := p.Args["book_authors"].([]interface{})
+	if !isOK {
+		return nil, nil
+	}
+
+	// Convert the list of interfaces to a list of strings
+	var authors []string
+	for _, author := range bookAuthors {
+		if authorStr, isStr := author.(string); isStr {
+			authors = append(authors, authorStr)
+		}
+	}
+
+	newBook := schema.Book{
+		ID:      newID,
+		Title:   newTitle,
+		Authors: authors,
+		Author:  schema.AuthorList,
+	}
+	schema.BookList = append(schema.BookList, newBook)
+	return newBook, nil
+}

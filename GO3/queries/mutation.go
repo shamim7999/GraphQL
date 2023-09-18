@@ -30,5 +30,26 @@ var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 			},
 			Resolve: resolver.CreateNewAuthorByParameter,
 		},
+
+		"CreateNewBook": &graphql.Field{
+			Type:        schema.BookType,
+			Description: "Create New Book",
+			Args:        graphql.FieldConfigArgument{},
+			Resolve:     resolver.CreateNewBook,
+		},
+
+		"CreateNewBookByParameter": &graphql.Field{
+			Type:        schema.BookType,
+			Description: "Create New Book by Parameter",
+			Args: graphql.FieldConfigArgument{
+				"title": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+				"book_authors": &graphql.ArgumentConfig{
+					Type: graphql.NewList(graphql.String),
+				},
+			},
+			Resolve: resolver.CreateNewBookByParameter,
+		},
 	},
 })

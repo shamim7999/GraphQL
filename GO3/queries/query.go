@@ -29,6 +29,24 @@ var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 			Resolve:     resolver.GetBooks,
 		},
 
+		"GetAuthors": &graphql.Field{
+			Type:        graphql.NewList(schema.AuthorType),
+			Description: "Returns  all Authors",
+			Args:        graphql.FieldConfigArgument{},
+			Resolve:     resolver.GetAuthors,
+		},
+
+		"GetAuthorByName": &graphql.Field{
+			Type:        schema.AuthorType,
+			Description: "Returns  all Authors",
+			Args: graphql.FieldConfigArgument{
+				"author_name": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+			},
+			Resolve: resolver.GetAuthorByName,
+		},
+
 		//////////////////////////
 
 	},

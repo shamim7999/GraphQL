@@ -46,13 +46,54 @@ func GetBooks(p graphql.ResolveParams) (interface{}, error) {
 	return schema.BookList, nil
 }
 
+func GetAuthors(p graphql.ResolveParams) (interface{}, error) {
+	return schema.AuthorList, nil
+}
+
+func GetAuthorByName(p graphql.ResolveParams) (interface{}, error) {
+	authorName, isOK := p.Args["author_name"].(string)
+	if !isOK {
+		return nil, nil
+	}
+	var author schema.Author
+	for _, person := range schema.AuthorList {
+		if person.AuthorName == authorName {
+			author.ID = person.ID
+			author.AuthorName = person.AuthorName
+			break
+		}
+	}
+	return author, nil
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
 func CreateNewAuthor(params graphql.ResolveParams) (interface{}, error) {
 
 	newID := RandStringRunes(8)
 	authors := "Shamim"
 	newAuthor := schema.Author{
-		ID:      newID,
+		ID:         newID,
 		AuthorName: authors,
+	}
+
+	schema.AuthorList = append(schema.AuthorList, newAuthor)
+	return newAuthor, nil
+}
+
+func CreateNewAuthorByParameter(p graphql.ResolveParams) (interface{}, error) {
+	authorName, isOK := p.Args["author_name"].(string)
+	if !isOK {
+		return nil, nil
+	}
+	authorID, isOK := p.Args["id"].(string)
+	if !isOK {
+		return nil, nil
+	}
+
+	newAuthor := schema.Author{
+		ID:         authorID,
+		AuthorName: authorName,
 	}
 
 	schema.AuthorList = append(schema.AuthorList, newAuthor)

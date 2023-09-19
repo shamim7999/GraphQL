@@ -1,11 +1,18 @@
 package schema
 
 import (
+	"context"
+	"fmt"
 	"github.com/graphql-go/graphql"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"graphql_test/db"
+	"log"
 )
 
 var (
 	AuthorList []Author
+	ok         bool
 )
 
 type Author struct {
@@ -29,7 +36,55 @@ var AuthorType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+func GetDataFromCollection(Col *mongo.Collection, Ctx context.Context) {
+	filter := bson.M{}
+	cursor, err := Col.Find(Ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer cursor.Close(Ctx)
+
+	for cursor.Next(Ctx) {
+		var author Author
+		var book Book
+		if ok == true {
+			if err := cursor.Decode(&author); err != nil {
+				log.Fatal(err)
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
+			author.Book = BookList
+			AuthorList = append(AuthorList, author)
+		} else {
+			if err := cursor.Decode(&book); err != nil {
+				log.Fatal(err)
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
+			BookList = append(BookList, &book)
+		}
+
+	}
+	if err := cursor.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+}
+
 func GetAuthors(p graphql.ResolveParams) (interface{}, error) {
+	ok = false
+	GetDataFromCollection(db.CollectionBook, db.CtxBook)
+	defer func() {
+		BookList = nil
+	}()
+	ok = true
+	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor)
+	defer func() {
+		AuthorList = nil
+	}()
+
 	return AuthorList, nil
 }
 
@@ -57,12 +112,21 @@ func CreateNewAuthor(p graphql.ResolveParams) (interface{}, error) {
 	}
 	authorID := RandStringRunes(8)
 
+	ok = false
+	GetDataFromCollection(db.CollectionBook, db.CtxBook)
+	defer func() {
+		BookList = nil
+	}()
 	newAuthor := Author{
 		ID:         authorID,
 		AuthorName: authorName,
-		Book:       BookList,
+		//Book:       BookList,
+	}
+	_, db.ErrAuthor = db.CollectionAuthor.InsertOne(db.CtxAuthor, newAuthor)
+	if db.ErrAuthor != nil {
+		log.Fatal(db.ErrAuthor)
 	}
 
-	AuthorList = append(AuthorList, newAuthor)
+	fmt.Println("Author inserted successfully.")
 	return newAuthor, nil
 }

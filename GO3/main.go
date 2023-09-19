@@ -1,34 +1,25 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/graphql-go/graphql"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"graphql_test/db"
 	"graphql_test/queries"
-	"graphql_test/schema"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
-
-	"github.com/graphql-go/graphql"
 )
 
-func init() {
-
-	book1 := &schema.Book{ID: "a", Title: "Golang", Authors: []string{"Shamim", "Saiful", "Ashraful", "Neaj"}}
-	book2 := &schema.Book{ID: "b2", Title: "C/C++", Authors: []string{"Ashraful", "Neaj"}}
-	book3 := &schema.Book{ID: "c3", Title: "JAVA", Authors: []string{"Ashraful", "Neaj"}}
-	book4 := &schema.Book{ID: "d4", Title: "Python", Authors: []string{"Shamim", "Saiful"}}
-	schema.BookList = append(schema.BookList, book1, book2, book3, book4)
-
-	Authors1 := schema.Author{ID: "a", AuthorName: "Shamim", Book: schema.BookList}
-	Authors2 := schema.Author{ID: "b", AuthorName: "Saiful", Book: schema.BookList}
-	Authors3 := schema.Author{ID: "c", AuthorName: "Ashraful", Book: schema.BookList}
-
-	schema.AuthorList = append(schema.AuthorList, Authors1, Authors2, Authors3)
-
-	rand.Seed(time.Now().UnixNano())
-}
+//func init() {
+//
+//
+//}
 
 func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 	result := graphql.Do(graphql.Params{
@@ -46,6 +37,32 @@ type ReqBody struct {
 }
 
 func main() {
+
+	db.ClientOptions = options.Client().ApplyURI(
+		"mongodb://admin:secret@localhost:27017",
+	).SetDirect(true)
+
+	db.CtxBook = context.Background()
+	db.ClientBook, db.ErrBook = mongo.Connect(db.CtxBook, db.ClientOptions)
+	if db.ErrBook != nil {
+		log.Fatal(db.ErrBook)
+	}
+	defer db.ClientBook.Disconnect(db.CtxBook)
+
+	db.CtxAuthor = context.Background()
+	db.ClientAuthor, db.ErrBook = mongo.Connect(db.CtxAuthor, db.ClientOptions)
+	if db.ErrAuthor != nil {
+		log.Fatal(db.ErrAuthor)
+	}
+	defer db.ClientAuthor.Disconnect(db.CtxAuthor)
+
+	fmt.Println("Connected to MongoDB")
+
+	db.Database = db.ClientBook.Database("shamim")
+	db.CollectionBook = db.Database.Collection("Book")
+	db.CollectionAuthor = db.Database.Collection("Author")
+	rand.Seed(time.Now().UnixNano())
+
 	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {

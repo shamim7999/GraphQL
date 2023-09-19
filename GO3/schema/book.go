@@ -1,7 +1,10 @@
 package schema
 
 import (
+	"fmt"
 	"github.com/graphql-go/graphql"
+	"graphql_test/db"
+	"log"
 	"math/rand"
 )
 
@@ -14,6 +17,8 @@ type Book struct {
 	Title   string   `json:"title"`
 	Authors []string `json:"authors"`
 }
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 var BookType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "Book",
@@ -30,8 +35,6 @@ var BookType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
 func RandStringRunes(n int) string {
 	b := make([]rune, n)
 	for i := range b {
@@ -45,9 +48,6 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 	if !isOK {
 		return nil, nil
 	}
-
-	//var matchingAuthors []schema.Author
-
 	var matchingBooks []*Book
 	BooksByAuthorName := Author{}
 
@@ -79,6 +79,12 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 }
 
 func GetBooks(p graphql.ResolveParams) (interface{}, error) {
+
+	ok = false
+	GetDataFromCollection(db.CollectionBook, db.CtxBook)
+	defer func() {
+		BookList = nil
+	}()
 	return BookList, nil
 }
 
@@ -105,6 +111,14 @@ func CreateNewBook(p graphql.ResolveParams) (interface{}, error) {
 		Title:   newTitle,
 		Authors: authors,
 	}
-	BookList = append(BookList, newBook)
+
+	_, db.ErrBook = db.CollectionBook.InsertOne(db.CtxBook, newBook)
+	if db.ErrBook != nil {
+		log.Fatal(db.ErrBook)
+	}
+
+	fmt.Println("Book inserted successfully.")
+
+	//BookList = append(BookList, newBook)
 	return newBook, nil
 }

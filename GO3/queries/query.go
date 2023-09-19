@@ -1,7 +1,6 @@
 package queries
 
 import (
-	"graphql_test/resolver"
 	"graphql_test/schema"
 
 	"github.com/graphql-go/graphql"
@@ -18,21 +17,21 @@ var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.String,
 				},
 			},
-			Resolve: resolver.GetBooksByAuthorName,
+			Resolve: schema.GetBooksByAuthorName,
 		},
 
 		"GetBooks": &graphql.Field{
 			Type:        graphql.NewList(schema.BookType),
 			Description: "Returns  all books",
 			Args:        graphql.FieldConfigArgument{},
-			Resolve:     resolver.GetBooks,
+			Resolve:     schema.GetBooks,
 		},
 
 		"GetAuthors": &graphql.Field{
 			Type:        graphql.NewList(schema.AuthorType),
 			Description: "Returns  all Authors",
 			Args:        graphql.FieldConfigArgument{},
-			Resolve:     resolver.GetAuthors,
+			Resolve:     schema.GetAuthors,
 		},
 
 		"GetAuthorByName": &graphql.Field{
@@ -43,7 +42,7 @@ var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.String,
 				},
 			},
-			Resolve: resolver.GetAuthorByName,
+			Resolve: schema.GetAuthorByName,
 		},
 	},
 })

@@ -14,16 +14,19 @@ import (
 )
 
 func init() {
-	Authors1 := schema.Author{ID: "a", AuthorName: "Shamim"}
-	Authors2 := schema.Author{ID: "b", AuthorName: "Saiful"}
-	Authors3 := schema.Author{ID: "c", AuthorName: "Ashraful"}
+
+	book1 := &schema.Book{ID: "a", Title: "Golang", Authors: []string{"Shamim", "Saiful", "Ashraful", "Neaj"}}
+	book2 := &schema.Book{ID: "b2", Title: "C/C++", Authors: []string{"Ashraful", "Neaj"}}
+	book3 := &schema.Book{ID: "c3", Title: "JAVA", Authors: []string{"Ashraful", "Neaj"}}
+	book4 := &schema.Book{ID: "d4", Title: "Python", Authors: []string{"Shamim", "Saiful"}}
+	schema.BookList = append(schema.BookList, book1, book2, book3, book4)
+
+	Authors1 := schema.Author{ID: "a", AuthorName: "Shamim", Book: schema.BookList}
+	Authors2 := schema.Author{ID: "b", AuthorName: "Saiful", Book: schema.BookList}
+	Authors3 := schema.Author{ID: "c", AuthorName: "Ashraful", Book: schema.BookList}
+
 	schema.AuthorList = append(schema.AuthorList, Authors1, Authors2, Authors3)
 
-	book1 := schema.Book{ID: "a", Title: "Golang", Authors: []string{"Shamim", "Saiful", "Ashraful", "Neaj"}, Author: schema.AuthorList}
-	book2 := schema.Book{ID: "b2", Title: "C/C++", Authors: []string{"Ashraful", "Neaj"}, Author: schema.AuthorList}
-	book3 := schema.Book{ID: "c3", Title: "JAVA", Authors: []string{"Ashraful", "Neaj"}, Author: schema.AuthorList}
-	book4 := schema.Book{ID: "d4", Title: "Python", Authors: []string{"Shamim", "Saiful"}, Author: schema.AuthorList}
-	schema.BookList = append(schema.BookList, book1, book2, book3, book4)
 	rand.Seed(time.Now().UnixNano())
 }
 

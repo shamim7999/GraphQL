@@ -24,19 +24,32 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 	}
 
 	//var matchingAuthors []schema.Author
-	var BooksByAuthorName []schema.Book
 
-	for _, datas := range schema.BookList {
-		for _, name := range datas.Authors {
-			if name == authorName {
-				BooksByAuthorName = append(BooksByAuthorName, schema.Book{
-					ID:      datas.ID,
-					Title:   datas.Title,
-					Authors: datas.Authors,
-				})
-				break
+	var matchingBooks []*schema.Book
+	BooksByAuthorName := schema.Author{}
+
+	for _, datas := range schema.AuthorList {
+		if datas.AuthorName != authorName {
+			continue
+		}
+		BookLists := datas.Book
+
+		for _, Books := range BookLists {
+			for _, names := range Books.Authors {
+				if names == authorName {
+					matchingBooks = append(matchingBooks, Books)
+					break
+				}
 			}
 		}
+
+		BooksByAuthorName = schema.Author{
+			ID:         datas.ID,
+			AuthorName: datas.AuthorName,
+			Book:       matchingBooks,
+		}
+
+		break
 	}
 
 	return BooksByAuthorName, nil
@@ -60,40 +73,24 @@ func GetAuthorByName(p graphql.ResolveParams) (interface{}, error) {
 		if person.AuthorName == authorName {
 			author.ID = person.ID
 			author.AuthorName = person.AuthorName
+			author.Book = schema.BookList
 			break
 		}
 	}
 	return author, nil
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
-func CreateNewAuthor(params graphql.ResolveParams) (interface{}, error) {
-
-	newID := RandStringRunes(8)
-	authors := "Shamim"
-	newAuthor := schema.Author{
-		ID:         newID,
-		AuthorName: authors,
-	}
-
-	schema.AuthorList = append(schema.AuthorList, newAuthor)
-	return newAuthor, nil
-}
-
-func CreateNewAuthorByParameter(p graphql.ResolveParams) (interface{}, error) {
+func CreateNewAuthor(p graphql.ResolveParams) (interface{}, error) {
 	authorName, isOK := p.Args["author_name"].(string)
 	if !isOK {
 		return nil, nil
 	}
-	authorID, isOK := p.Args["id"].(string)
-	if !isOK {
-		return nil, nil
-	}
+	authorID := RandStringRunes(8)
 
 	newAuthor := schema.Author{
 		ID:         authorID,
 		AuthorName: authorName,
+		Book:       schema.BookList,
 	}
 
 	schema.AuthorList = append(schema.AuthorList, newAuthor)
@@ -101,28 +98,16 @@ func CreateNewAuthorByParameter(p graphql.ResolveParams) (interface{}, error) {
 }
 
 func CreateNewBook(p graphql.ResolveParams) (interface{}, error) {
-	newBook := schema.Book{
-		ID:      RandStringRunes(8),
-		Title:   "A new Book",
-		Authors: []string{"Ashraful", "Ashik", "Morshed"},
-		Author:  schema.AuthorList,
-	}
-	schema.BookList = append(schema.BookList, newBook)
-	return newBook, nil
-}
-
-func CreateNewBookByParameter(p graphql.ResolveParams) (interface{}, error) {
 	newID := RandStringRunes(8)
 	newTitle, isOK := p.Args["title"].(string)
 	if !isOK {
 		return nil, nil
 	}
-	bookAuthors, isOK := p.Args["book_authors"].([]interface{})
+	bookAuthors, isOK := p.Args["authors"].([]interface{})
 	if !isOK {
 		return nil, nil
 	}
 
-	// Convert the list of interfaces to a list of strings
 	var authors []string
 	for _, author := range bookAuthors {
 		if authorStr, isStr := author.(string); isStr {
@@ -130,11 +115,10 @@ func CreateNewBookByParameter(p graphql.ResolveParams) (interface{}, error) {
 		}
 	}
 
-	newBook := schema.Book{
+	newBook := &schema.Book{
 		ID:      newID,
 		Title:   newTitle,
 		Authors: authors,
-		Author:  schema.AuthorList,
 	}
 	schema.BookList = append(schema.BookList, newBook)
 	return newBook, nil

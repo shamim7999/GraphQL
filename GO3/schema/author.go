@@ -4,12 +4,12 @@ import "github.com/graphql-go/graphql"
 
 var (
 	AuthorList []Author
-	//BookList []Book
 )
 
 type Author struct {
-	ID      		string `json:"id"`
-	AuthorName 		string `json:"author_name"`
+	ID         string  `json:"id"`
+	AuthorName string  `json:"author_name"`
+	Book       []*Book `json:"book"`
 }
 
 var AuthorType = graphql.NewObject(graphql.ObjectConfig{
@@ -20,6 +20,9 @@ var AuthorType = graphql.NewObject(graphql.ObjectConfig{
 		},
 		"author_name": &graphql.Field{
 			Type: graphql.String,
+		},
+		"book": &graphql.Field{
+			Type: graphql.NewList(BookType),
 		},
 	},
 })

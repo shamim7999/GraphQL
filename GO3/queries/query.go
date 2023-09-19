@@ -10,9 +10,8 @@ import (
 var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
-		///////////////////////////
 		"GetBooksByAuthorName": &graphql.Field{
-			Type:        graphql.NewList(schema.BookType),
+			Type:        schema.AuthorType,
 			Description: "List of books with associated todos",
 			Args: graphql.FieldConfigArgument{
 				"author_name": &graphql.ArgumentConfig{
@@ -38,7 +37,7 @@ var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 
 		"GetAuthorByName": &graphql.Field{
 			Type:        schema.AuthorType,
-			Description: "Returns  all Authors",
+			Description: "Returns Authors By Name",
 			Args: graphql.FieldConfigArgument{
 				"author_name": &graphql.ArgumentConfig{
 					Type: graphql.String,
@@ -46,8 +45,5 @@ var RootQuery = graphql.NewObject(graphql.ObjectConfig{
 			},
 			Resolve: resolver.GetAuthorByName,
 		},
-
-		//////////////////////////
-
 	},
 })

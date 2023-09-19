@@ -10,14 +10,8 @@ import (
 var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootMutation",
 	Fields: graphql.Fields{
-		"CreateNewAuthor": &graphql.Field{
-			Type:        schema.AuthorType,
-			Description: "Create new Author",
-			Args:        graphql.FieldConfigArgument{},
-			Resolve:     resolver.CreateNewAuthor,
-		},
 
-		"CreateNewAuthorByParameter": &graphql.Field{
+		"CreateNewAuthor": &graphql.Field{
 			Type:        schema.AuthorType,
 			Description: "Create New Author With Given Parameter",
 			Args: graphql.FieldConfigArgument{
@@ -28,28 +22,20 @@ var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.String,
 				},
 			},
-			Resolve: resolver.CreateNewAuthorByParameter,
+			Resolve: resolver.CreateNewAuthor,
 		},
-
 		"CreateNewBook": &graphql.Field{
-			Type:        schema.BookType,
-			Description: "Create New Book",
-			Args:        graphql.FieldConfigArgument{},
-			Resolve:     resolver.CreateNewBook,
-		},
-
-		"CreateNewBookByParameter": &graphql.Field{
 			Type:        schema.BookType,
 			Description: "Create New Book by Parameter",
 			Args: graphql.FieldConfigArgument{
 				"title": &graphql.ArgumentConfig{
 					Type: graphql.String,
 				},
-				"book_authors": &graphql.ArgumentConfig{
+				"authors": &graphql.ArgumentConfig{
 					Type: graphql.NewList(graphql.String),
 				},
 			},
-			Resolve: resolver.CreateNewBookByParameter,
+			Resolve: resolver.CreateNewBook,
 		},
 	},
 })

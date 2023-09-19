@@ -1,6 +1,8 @@
 package schema
 
-import "github.com/graphql-go/graphql"
+import (
+	"github.com/graphql-go/graphql"
+)
 
 var (
 	AuthorList []Author
@@ -26,3 +28,41 @@ var AuthorType = graphql.NewObject(graphql.ObjectConfig{
 		},
 	},
 })
+
+func GetAuthors(p graphql.ResolveParams) (interface{}, error) {
+	return AuthorList, nil
+}
+
+func GetAuthorByName(p graphql.ResolveParams) (interface{}, error) {
+	authorName, isOK := p.Args["author_name"].(string)
+	if !isOK {
+		return nil, nil
+	}
+	var author Author
+	for _, person := range AuthorList {
+		if person.AuthorName == authorName {
+			author.ID = person.ID
+			author.AuthorName = person.AuthorName
+			author.Book = BookList
+			break
+		}
+	}
+	return author, nil
+}
+
+func CreateNewAuthor(p graphql.ResolveParams) (interface{}, error) {
+	authorName, isOK := p.Args["author_name"].(string)
+	if !isOK {
+		return nil, nil
+	}
+	authorID := RandStringRunes(8)
+
+	newAuthor := Author{
+		ID:         authorID,
+		AuthorName: authorName,
+		Book:       BookList,
+	}
+
+	AuthorList = append(AuthorList, newAuthor)
+	return newAuthor, nil
+}

@@ -37,7 +37,6 @@ var AuthorType = graphql.NewObject(graphql.ObjectConfig{
 })
 
 func GetDataFromCollection(Col *mongo.Collection, Ctx context.Context, filter bson.M) {
-	//filter := bson.M{}
 	cursor, err := Col.Find(Ctx, filter)
 	if err != nil {
 		log.Fatal(err)
@@ -76,12 +75,12 @@ func GetDataFromCollection(Col *mongo.Collection, Ctx context.Context, filter bs
 func GetAuthors(p graphql.ResolveParams) (interface{}, error) {
 	filter := bson.M{}
 	ok = false
-	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
+	GetDataFromCollection(db.CollectionBook, db.Ctx, filter)
 	defer func() {
 		BookList = nil
 	}()
 	ok = true
-	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor, filter)
+	GetDataFromCollection(db.CollectionAuthor, db.Ctx, filter)
 	defer func() {
 		AuthorList = nil
 	}()
@@ -102,7 +101,7 @@ func GetAuthorByName(p graphql.ResolveParams) (interface{}, error) {
 		"authorname": authorName,
 	}
 	ok = true
-	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor, filter)
+	GetDataFromCollection(db.CollectionAuthor, db.Ctx, filter)
 	defer func() {
 		AuthorList = nil
 	}()
@@ -121,18 +120,17 @@ func CreateNewAuthor(p graphql.ResolveParams) (interface{}, error) {
 	authorID := RandStringRunes(8)
 
 	ok = false
-	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
+	GetDataFromCollection(db.CollectionBook, db.Ctx, filter)
 	defer func() {
 		BookList = nil
 	}()
 	newAuthor := Author{
 		ID:         authorID,
 		AuthorName: authorName,
-		//Book:       BookList,
 	}
-	_, db.ErrAuthor = db.CollectionAuthor.InsertOne(db.CtxAuthor, newAuthor)
-	if db.ErrAuthor != nil {
-		log.Fatal(db.ErrAuthor)
+	_, db.Err = db.CollectionAuthor.InsertOne(db.Ctx, newAuthor)
+	if db.Err != nil {
+		log.Fatal(db.Err)
 	}
 
 	fmt.Println("Author inserted successfully.")

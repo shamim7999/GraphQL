@@ -37,23 +37,16 @@ func main() {
 		"mongodb://admin:secret@localhost:27017",
 	).SetDirect(true)
 
-	db.CtxBook = context.Background()
-	db.ClientBook, db.ErrBook = mongo.Connect(db.CtxBook, db.ClientOptions)
-	if db.ErrBook != nil {
-		log.Fatal(db.ErrBook)
+	db.Ctx = context.Background()
+	db.Client, db.Err = mongo.Connect(db.Ctx, db.ClientOptions)
+	if db.Err != nil {
+		log.Fatal(db.Err)
 	}
-	defer db.ClientBook.Disconnect(db.CtxBook)
-
-	db.CtxAuthor = context.Background()
-	db.ClientAuthor, db.ErrBook = mongo.Connect(db.CtxAuthor, db.ClientOptions)
-	if db.ErrAuthor != nil {
-		log.Fatal(db.ErrAuthor)
-	}
-	defer db.ClientAuthor.Disconnect(db.CtxAuthor)
+	defer db.Client.Disconnect(db.Ctx)
 
 	fmt.Println("Connected to MongoDB")
 
-	db.Database = db.ClientBook.Database("shamim")
+	db.Database = db.Client.Database("shamim")
 	db.CollectionBook = db.Database.Collection("Book")
 	db.CollectionAuthor = db.Database.Collection("Author")
 	rand.Seed(time.Now().UnixNano())

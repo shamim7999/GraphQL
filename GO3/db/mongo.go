@@ -11,10 +11,7 @@ var (
 	CollectionBook   *mongo.Collection
 	CollectionAuthor *mongo.Collection
 	ClientOptions    *options.ClientOptions
-	ClientBook       *mongo.Client
-	ErrBook          error
-	CtxBook          context.Context
-	CtxAuthor        context.Context
-	ErrAuthor        error
-	ClientAuthor     *mongo.Client
+	Client           *mongo.Client
+	Err              error
+	Ctx              context.Context
 )

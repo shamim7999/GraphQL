@@ -58,7 +58,7 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 		"authorname": authorName,
 	}
 	ok = true
-	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor, filter)
+	GetDataFromCollection(db.CollectionAuthor, db.Ctx, filter)
 	defer func() {
 		AuthorList = nil
 	}()
@@ -72,7 +72,7 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 	}
 
 	ok = false
-	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
+	GetDataFromCollection(db.CollectionBook, db.Ctx, filter)
 	defer func() {
 		BookList = nil
 	}()
@@ -93,7 +93,7 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 func GetBooks(p graphql.ResolveParams) (interface{}, error) {
 	filter := bson.M{}
 	ok = false
-	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
+	GetDataFromCollection(db.CollectionBook, db.Ctx, filter)
 	defer func() {
 		BookList = nil
 	}()
@@ -124,9 +124,9 @@ func CreateNewBook(p graphql.ResolveParams) (interface{}, error) {
 		Authors: authors,
 	}
 
-	_, db.ErrBook = db.CollectionBook.InsertOne(db.CtxBook, newBook)
-	if db.ErrBook != nil {
-		log.Fatal(db.ErrBook)
+	_, db.Err = db.CollectionBook.InsertOne(db.Ctx, newBook)
+	if db.Err != nil {
+		log.Fatal(db.Err)
 	}
 
 	fmt.Println("Book inserted successfully.")

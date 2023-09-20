@@ -1,11 +1,7 @@
 package schema
 
 import (
-	"fmt"
 	"github.com/graphql-go/graphql"
-	"go.mongodb.org/mongo-driver/bson"
-	"graphql_test/db"
-	"log"
 	"math/rand"
 )
 
@@ -42,94 +38,4 @@ func RandStringRunes(n int) string {
 		b[i] = letterRunes[rand.Intn(len(letterRunes))]
 	}
 	return string(b)
-}
-
-func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
-
-	authorName, isOK := p.Args["author_name"].(string)
-	if !isOK {
-		return nil, nil
-	}
-
-	//var matchingBooks []*Book
-	BooksByAuthorName := Author{}
-
-	filter := bson.M{
-		"authorname": authorName,
-	}
-	ok = true
-	GetDataFromCollection(db.CollectionAuthor, db.Ctx, filter)
-	defer func() {
-		AuthorList = nil
-	}()
-
-	filter = bson.M{
-		"authors": bson.M{
-			"$elemMatch": bson.M{
-				"$eq": authorName,
-			},
-		},
-	}
-
-	ok = false
-	GetDataFromCollection(db.CollectionBook, db.Ctx, filter)
-	defer func() {
-		BookList = nil
-	}()
-
-	if len(AuthorList) == 0 {
-		return nil, nil
-	}
-
-	BooksByAuthorName = Author{
-		ID:         AuthorList[0].ID,
-		AuthorName: AuthorList[0].AuthorName,
-		Book:       BookList,
-	}
-
-	return BooksByAuthorName, nil
-}
-
-func GetBooks(p graphql.ResolveParams) (interface{}, error) {
-	filter := bson.M{}
-	ok = false
-	GetDataFromCollection(db.CollectionBook, db.Ctx, filter)
-	defer func() {
-		BookList = nil
-	}()
-	return BookList, nil
-}
-
-func CreateNewBook(p graphql.ResolveParams) (interface{}, error) {
-	newID := RandStringRunes(8)
-	newTitle, isOK := p.Args["title"].(string)
-	if !isOK {
-		return nil, nil
-	}
-	bookAuthors, isOK := p.Args["authors"].([]interface{})
-	if !isOK {
-		return nil, nil
-	}
-
-	var authors []string
-	for _, author := range bookAuthors {
-		if authorStr, isStr := author.(string); isStr {
-			authors = append(authors, authorStr)
-		}
-	}
-
-	newBook := &Book{
-		ID:      newID,
-		Title:   newTitle,
-		Authors: authors,
-	}
-
-	_, db.Err = db.CollectionBook.InsertOne(db.Ctx, newBook)
-	if db.Err != nil {
-		log.Fatal(db.Err)
-	}
-
-	fmt.Println("Book inserted successfully.")
-
-	return newBook, nil
 }

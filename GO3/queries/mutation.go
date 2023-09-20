@@ -1,6 +1,7 @@
 package queries
 
 import (
+	"graphql_test/resolvers"
 	"graphql_test/schema"
 
 	"github.com/graphql-go/graphql"
@@ -21,7 +22,7 @@ var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.String,
 				},
 			},
-			Resolve: schema.CreateNewAuthor,
+			Resolve: resolvers.CreateNewAuthor,
 		},
 		"CreateNewBook": &graphql.Field{
 			Type:        schema.BookType,
@@ -34,7 +35,7 @@ var RootMutation = graphql.NewObject(graphql.ObjectConfig{
 					Type: graphql.NewList(graphql.String),
 				},
 			},
-			Resolve: schema.CreateNewBook,
+			Resolve: resolvers.CreateNewBook,
 		},
 	},
 })

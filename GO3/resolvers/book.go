@@ -33,7 +33,6 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 	filter := bson.M{
 		"authorname": authorName,
 	}
-	//ok = true
 	AuthorsList = db.GetDataFromAuthorCollection(filter)
 
 	filter = bson.M{
@@ -44,7 +43,6 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 		},
 	}
 
-	//ok = false
 	BooksList = db.GetDataFromBookCollection(filter)
 
 	if len(AuthorsList) == 0 {

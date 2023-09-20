@@ -30,7 +30,6 @@ func CreateNewAuthor(p graphql.ResolveParams) (interface{}, error) {
 	}
 	authorID := schema.RandStringRunes(8)
 
-	//ok = false
 	var BooksList []*schema.Book
 	BooksList = db.GetDataFromBookCollection(filter)
 
@@ -58,7 +57,7 @@ func GetAuthorByName(p graphql.ResolveParams) (interface{}, error) {
 	filter := bson.M{
 		"authorname": authorName,
 	}
-	//ok = true
+
 	var AuthorsList []schema.Author
 	AuthorsList = db.GetDataFromAuthorCollection(filter)
 

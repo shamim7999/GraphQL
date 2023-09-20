@@ -6,7 +6,6 @@ import (
 
 var (
 	AuthorList []Author
-	ok         bool
 )
 
 type Author struct {

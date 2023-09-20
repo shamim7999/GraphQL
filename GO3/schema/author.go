@@ -4,10 +4,6 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-var (
-	AuthorList []Author
-)
-
 type Author struct {
 	ID         string  `json:"id"`
 	AuthorName string  `json:"author_name"`

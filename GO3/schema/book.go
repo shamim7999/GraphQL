@@ -5,10 +5,6 @@ import (
 	"math/rand"
 )
 
-var (
-	BookList []*Book
-)
-
 type Book struct {
 	ID      string   `json:"id"`
 	Title   string   `json:"title"`

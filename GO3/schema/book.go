@@ -3,6 +3,7 @@ package schema
 import (
 	"fmt"
 	"github.com/graphql-go/graphql"
+	"go.mongodb.org/mongo-driver/bson"
 	"graphql_test/db"
 	"log"
 	"math/rand"
@@ -44,44 +45,55 @@ func RandStringRunes(n int) string {
 }
 
 func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
+
 	authorName, isOK := p.Args["author_name"].(string)
 	if !isOK {
 		return nil, nil
 	}
-	var matchingBooks []*Book
+
+	//var matchingBooks []*Book
 	BooksByAuthorName := Author{}
 
-	for _, datas := range AuthorList {
-		if datas.AuthorName != authorName {
-			continue
-		}
-		BookLists := datas.Book
+	filter := bson.M{
+		"authorname": authorName,
+	}
+	ok = true
+	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor, filter)
+	defer func() {
+		AuthorList = nil
+	}()
 
-		for _, Books := range BookLists {
-			for _, names := range Books.Authors {
-				if names == authorName {
-					matchingBooks = append(matchingBooks, Books)
-					break
-				}
-			}
-		}
+	filter = bson.M{
+		"authors": bson.M{
+			"$elemMatch": bson.M{
+				"$eq": authorName,
+			},
+		},
+	}
 
-		BooksByAuthorName = Author{
-			ID:         datas.ID,
-			AuthorName: datas.AuthorName,
-			Book:       matchingBooks,
-		}
+	ok = false
+	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
+	defer func() {
+		BookList = nil
+	}()
 
-		break
+	if len(AuthorList) == 0 {
+		return nil, nil
+	}
+
+	BooksByAuthorName = Author{
+		ID:         AuthorList[0].ID,
+		AuthorName: AuthorList[0].AuthorName,
+		Book:       BookList,
 	}
 
 	return BooksByAuthorName, nil
 }
 
 func GetBooks(p graphql.ResolveParams) (interface{}, error) {
-
+	filter := bson.M{}
 	ok = false
-	GetDataFromCollection(db.CollectionBook, db.CtxBook)
+	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
 	defer func() {
 		BookList = nil
 	}()
@@ -119,6 +131,5 @@ func CreateNewBook(p graphql.ResolveParams) (interface{}, error) {
 
 	fmt.Println("Book inserted successfully.")
 
-	//BookList = append(BookList, newBook)
 	return newBook, nil
 }

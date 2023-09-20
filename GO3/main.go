@@ -16,11 +16,6 @@ import (
 	"time"
 )
 
-//func init() {
-//
-//
-//}
-
 func executeQuery(query string, schema graphql.Schema) *graphql.Result {
 	result := graphql.Do(graphql.Params{
 		Schema:        schema,

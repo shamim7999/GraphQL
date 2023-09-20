@@ -36,8 +36,8 @@ var AuthorType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-func GetDataFromCollection(Col *mongo.Collection, Ctx context.Context) {
-	filter := bson.M{}
+func GetDataFromCollection(Col *mongo.Collection, Ctx context.Context, filter bson.M) {
+	//filter := bson.M{}
 	cursor, err := Col.Find(Ctx, filter)
 	if err != nil {
 		log.Fatal(err)
@@ -74,17 +74,21 @@ func GetDataFromCollection(Col *mongo.Collection, Ctx context.Context) {
 }
 
 func GetAuthors(p graphql.ResolveParams) (interface{}, error) {
+	filter := bson.M{}
 	ok = false
-	GetDataFromCollection(db.CollectionBook, db.CtxBook)
+	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
 	defer func() {
 		BookList = nil
 	}()
 	ok = true
-	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor)
+	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor, filter)
 	defer func() {
 		AuthorList = nil
 	}()
 
+	if len(AuthorList) == 0 {
+		return nil, nil
+	}
 	return AuthorList, nil
 }
 
@@ -93,19 +97,23 @@ func GetAuthorByName(p graphql.ResolveParams) (interface{}, error) {
 	if !isOK {
 		return nil, nil
 	}
-	var author Author
-	for _, person := range AuthorList {
-		if person.AuthorName == authorName {
-			author.ID = person.ID
-			author.AuthorName = person.AuthorName
-			author.Book = BookList
-			break
-		}
+
+	filter := bson.M{
+		"authorname": authorName,
 	}
-	return author, nil
+	ok = true
+	GetDataFromCollection(db.CollectionAuthor, db.CtxAuthor, filter)
+	defer func() {
+		AuthorList = nil
+	}()
+	if len(AuthorList) == 0 {
+		return nil, nil
+	}
+	return AuthorList[0], nil
 }
 
 func CreateNewAuthor(p graphql.ResolveParams) (interface{}, error) {
+	filter := bson.M{}
 	authorName, isOK := p.Args["author_name"].(string)
 	if !isOK {
 		return nil, nil
@@ -113,7 +121,7 @@ func CreateNewAuthor(p graphql.ResolveParams) (interface{}, error) {
 	authorID := RandStringRunes(8)
 
 	ok = false
-	GetDataFromCollection(db.CollectionBook, db.CtxBook)
+	GetDataFromCollection(db.CollectionBook, db.CtxBook, filter)
 	defer func() {
 		BookList = nil
 	}()

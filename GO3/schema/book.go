@@ -6,9 +6,9 @@ import (
 )
 
 type Book struct {
-	ID      string   `json:"id"`
-	Title   string   `json:"title"`
-	Authors []string `json:"authors"`
+	ID      string   `json:"id" bson:"id"`
+	Title   string   `json:"title" bson:"title"`
+	Authors []string `json:"authors" bson:"authors"`
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")

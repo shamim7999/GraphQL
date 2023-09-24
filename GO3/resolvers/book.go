@@ -31,7 +31,7 @@ func GetBooksByAuthorName(p graphql.ResolveParams) (interface{}, error) {
 	BooksByAuthorName := schema.Author{}
 
 	filter := bson.M{
-		"authorname": authorName,
+		"author_name": authorName,
 	}
 	AuthorsList = db.GetDataFromAuthorCollection(filter)
 

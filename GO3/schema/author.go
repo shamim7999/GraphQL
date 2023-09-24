@@ -5,9 +5,9 @@ import (
 )
 
 type Author struct {
-	ID         string  `json:"id"`
-	AuthorName string  `json:"author_name"`
-	Book       []*Book `json:"book"`
+	ID         string  `json:"id" bson:"id"`
+	AuthorName string  `json:"author_name" bson:"author_name"`
+	Book       []*Book `json:"book" bson:"book"`
 }
 
 var AuthorType = graphql.NewObject(graphql.ObjectConfig{

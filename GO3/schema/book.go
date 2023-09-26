@@ -42,19 +42,16 @@ var BookType = graphql.NewObject(graphql.ObjectConfig{
 })
 
 var BookLoader = dataloader.NewBatchedLoader(func(ctx context.Context, keys dataloader.Keys) []*dataloader.Result {
-	// Fetch books from MongoDB by their IDs.
 	var bookIDs []string
 	for _, key := range keys {
 		bookID := key.String()
 		bookIDs = append(bookIDs, bookID)
 	}
 
-	// Fetch books from MongoDB by their IDs.
 	var books []*Book // Use the Book type from your schema package
 	filter := bson.M{"_id": bson.M{"$in": bookIDs}}
 	cursor, err := db.CollectionBook.Find(ctx, filter)
 	if err != nil {
-		// Handle the error, possibly returning empty results for failed keys.
 		results := make([]*dataloader.Result, len(keys))
 		for i := range results {
 			results[i] = &dataloader.Result{Error: err}
@@ -63,9 +60,8 @@ var BookLoader = dataloader.NewBatchedLoader(func(ctx context.Context, keys data
 	}
 	defer cursor.Close(ctx)
 	for cursor.Next(ctx) {
-		var book Book // Use the Book type from your schema package
+		var book Book
 		if err := cursor.Decode(&book); err != nil {
-			// Handle the error, possibly returning empty results for failed keys.
 			results := make([]*dataloader.Result, len(keys))
 			for i := range results {
 				results[i] = &dataloader.Result{Error: err}
@@ -75,11 +71,10 @@ var BookLoader = dataloader.NewBatchedLoader(func(ctx context.Context, keys data
 		books = append(books, &book)
 	}
 
-	// Create results based on the order of keys.
 	results := make([]*dataloader.Result, len(keys))
 	for i, key := range keys {
 		bookID := key.String()
-		var matchingBook *Book // Use the Book type from your schema package
+		var matchingBook *Book
 		for _, book := range books {
 			if book.ID == bookID {
 				matchingBook = book

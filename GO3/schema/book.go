@@ -48,7 +48,7 @@ var BookLoader = dataloader.NewBatchedLoader(func(ctx context.Context, keys data
 		bookIDs = append(bookIDs, bookID)
 	}
 
-	var books []*Book // Use the Book type from your schema package
+	var books []*Book
 	filter := bson.M{"_id": bson.M{"$in": bookIDs}}
 	cursor, err := db.CollectionBook.Find(ctx, filter)
 	if err != nil {

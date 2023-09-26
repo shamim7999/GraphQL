@@ -2,14 +2,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/graphql-go/graphql"
+	"github.com/graphql-go/handler"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"graphql_test/db"
 	"graphql_test/queries"
-	"io/ioutil"
+	"graphql_test/schema"
 	"log"
 	"math/rand"
 	"net/http"
@@ -51,27 +51,22 @@ func main() {
 	db.CollectionAuthor = db.Database.Collection("Author")
 	rand.Seed(time.Now().UnixNano())
 
-	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			panic(err)
-		}
-		var t ReqBody
-		err = json.Unmarshal(body, &t)
-		if err != nil {
-			panic(err)
-		}
-		result := executeQuery(t.Query, queries.QueriesAndMutation)
-		json.NewEncoder(w).Encode(result)
+	customMiddleware := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, "authorLoader", schema.AuthorLoader)
+			ctx = context.WithValue(ctx, "bookLoader", schema.BookLoader)
+			r = r.WithContext(ctx)
+			next.ServeHTTP(w, r)
+		})
+	}
+	graphqlHandler := handler.New(&handler.Config{
+		Schema: &queries.QueriesAndMutation,
+		Pretty: true,
 	})
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/", fs)
+	http.Handle("/graphql", customMiddleware(graphqlHandler))
+
 	fmt.Println("Now server is running on port 8080")
-	fmt.Println("Get single Authors: curl -g 'http://localhost:8080/graphql?query={Authors(id:\"b\"){id,text,done}}'")
-	fmt.Println("Create new Authors: curl -g 'http://localhost:8080/graphql?query=mutation+_{createAuthors(text:\"My+new+Authors\"){id,text,done}}'")
-	fmt.Println("Update Authors: curl -g 'http://localhost:8080/graphql?query=mutation+_{updateAuthors(id:\"a\",done:true){id,text,done}}'")
-	fmt.Println("Load Authors list: curl -g 'http://localhost:8080/graphql?query={AuthorList{id,text,done}}'")
-	fmt.Println("Access the web app via browser at 'http://localhost:8080'")
 
 	http.ListenAndServe(":8080", nil)
 }
